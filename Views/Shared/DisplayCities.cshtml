@@ -1,0 +1,9 @@
+﻿@model formtask2.city
+
+<option value="">--select Cities--</option>
+@if (ViewBag.citylist != null)
+{
+    foreach (var item in ViewBag.citylist)
+    {
+<option value="@item.Value">@item.Text</option>}
+            }

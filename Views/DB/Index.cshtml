@@ -1,0 +1,49 @@
+﻿@model formtask2.Models.Users
+@{
+    ViewBag.Title = "Index";
+}
+
+<h2>Index</h2>
+
+@if (ViewBag.CountryList != null)
+{
+@Html.DropDownListFor(m => m.cid, ViewBag.CountryList as SelectList, "--select county Name--", new { @class = "form-control" })
+}
+@Html.DropDownListFor(m => m.sid, new SelectList(" "), "--select state Name--", new { @class = "form-control" })
+@Html.DropDownListFor(m => m.cityid, new SelectList(" "), "--select Cities Name--", new { @class = "form-control" })
+<script src="~/Scripts/jquery-3.4.1.min.js"></script>
+<script>
+    $(document).ready(function () {
+        $("#cid").change(function () {
+            var countryId = $(this).val();
+            debugger
+            $.ajax({
+                type: "post",
+                url: "/cas/GetStates?cid=" + countryId,
+                contentType: "html",
+                success: function (response) {
+                    debugger
+                    $("#sid").empty();
+                    $("#cityid").empty();
+                    $("#sid").append(response);
+                }
+            })
+        })
+
+        $("#sid").change(function () {
+            var StateId = $(this).val();
+            debugger
+            $.ajax({
+                type: "post",
+                url: "/cas/GetCities?sid=" + StateId,
+                contentType: "html",
+                success: function (response) {
+                    debugger
+                    $("#cityid").empty();
+                    $("#cityid").append(response);
+                }
+            })
+        })
+    })
+
+</script>

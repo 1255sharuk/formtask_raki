@@ -1,0 +1,206 @@
+﻿@model formtask2.Models.Users
+@{
+    ViewBag.Title = "Register";
+}
+
+<h2>Register</h2>
+<html>
+<head>
+    <meta name="viewport" content="width=device-width" />
+    <title>Form</title>
+    <link href="~/Content/bootstrap.min.css" rel="stylesheet" />
+    <script src="~/Scripts/bootstrap.min.js"></script>
+
+    <script src="~/Scripts/jquery-3.6.0.slim.min.js"></script>
+
+    <script>
+        $(document).ready(function () {
+            $('#UserType').change(function () {
+                var UserType = $(this).val();
+                if (UserType == 'Admin') {
+                    // Show admin fields
+                    $('#adminFields').show();
+                    $('#userFields').hide();
+                } else if (UserType == 'User') {
+                    // Show user fields
+                    $('#adminFields').hide();
+                    $('#userFields').show();
+                } else {
+                    // Hide both fields
+                    $('#adminFields').hide();
+                    $('#userFields').hide();
+                }
+            });
+        });
+    </script>
+    <script>
+    $(function () {
+        $("#refreshCaptcha").click(function () {
+            $("#Imageforcaptcha").attr("src", "@Url.Action("Imageforcaptcha", "User")?" + new Date().getTime());
+            $("#captcha").val("");
+            return false;
+        });
+    });
+
+    function Submitdata() {
+        var captchaText = $("#captcha").val();
+        var expectedText = "@Session["CaptchaText"]";
+        if (captchaText !== expectedText) {
+            alert("Incorrect captcha text. Please try again.");
+            $("#Imageforcaptcha").attr("src", "@Url.Action("Imageforcaptcha", "User")?" + new Date().getTime());
+            $("#captcha").val("");
+            return false;
+        }
+    }
+    </script>
+    @*<link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">*@
+
+</head>
+<body>
+    <form method="post" onsubmit="return Submitdata();">
+        <div>
+            <label for="UserType">Select User Type:</label>
+            <select id="UserType" name="UserType" class="form-control" onchange="ready()">
+                <option value="">Select User Type</option>
+                @foreach (var item in ViewBag.UserTypeList)
+                {
+                    <option value="@item.Value">@item.Text</option>
+                }
+            </select>
+            <br />
+            <div id="userFields">
+                <div class="row">
+                    <div class="col-sm-6 col-md-4 mb-5">
+                        <label for="UserName" style="font-family:Times New Roman">Enter UserName:</label>
+                        <input id="UserName" style="font-family:Times New Roman" name="UserName" type="text" class="form-control" placeholder="User Name" />
+                        <br />
+                    </div>
+                    <div class="col-sm-6 col-md-4 mb-5">
+                        <label for="UserEmail" style="font-family:Times New Roman">Enter UserEmail:</label>
+                        <input id="UserEmail" style="font-family:Times New Roman" name="UserEmail" type="email" class="form-control" placeholder="User Email-Id" />
+                        <br />
+                    </div>
+                </div>
+                <label for="UserDateOfBirth" style="font-family:Times New Roman">Select User's Date of Birth:</label>
+                <input id="UserDateOfBirth" style="font-family:Times New Roman" name="UserDateOfBirth" type="date" class="form-control" />
+                <br />
+                <label for="UserFile" style="font-family:Times New Roman">Select User file:</label>
+                <input id="UserFile" style="font-family:Times New Roman" name="UserFile" type="file" class="form-control" />
+                <br />
+            </div>
+            <div id="adminFields" style="display:none">
+                <label for="AdminName" style="font-family:Times New Roman">Enter AdminName:</label>
+                <input id="AdminName" style="font-family:Times New Roman" name="AdminName" type="text" class="form-control" placeholder="Admin Name" />
+                <br />
+                <label for="AdminEmail" style="font-family:Times New Roman">Enter AdminEmail:</label>
+                <input id="AdminEmail" style="font-family:Times New Roman" name="AdminEmail" type="email" class="form-control" placeholder="Admin Email-Id" />
+                <br />
+                <label for="AdminDateOfBirth" style="font-family:Times New Roman">Select Admin's Date of Birth:</label>
+                <input id="AdminDateOfBirth" style="font-family:Times New Roman" name="AdminDateOfBirth" type="date" class="form-control" />
+                <br />
+                <label for="AdminFile" style="font-family:Times New Roman">Select Admin file:</label>
+                <input id="AdminFile" style="font-family:Times New Roman" name="AdminFile" type="file" class="form-control" />
+                <br />
+                <div>
+                    <label for="cid" style="font-family:Times New Roman">Country:</label>
+                    <select name="cid" style="font-family:Times New Roman" id="cid" class="form-control">
+                        <option value="" style="font-family:Times New Roman">--select country Name--</option>
+                        @foreach (var item in ViewBag.CountryList)
+                        {
+                            <option value="@item.Value">@item.Text</option>
+                        }
+                    </select>
+                </div>
+
+                <div>
+                    <label for="sid" style="font-family:Times New Roman">State:</label>
+                    <select name="sid" id="sid" class="form-control" style="font-family:Times New Roman">
+                        <option value="" style="font-family:Times New Roman">--select state Name--</option>
+                    </select>
+                </div>
+                <div>
+                    <label for="cityid" style="font-family:Times New Roman">City:</label>
+                    <select name="cityid" id="cityid" class="form-control" style="font-family:Times New Roman">
+                        <option value="" style="font-family:Times New Roman">--select city Name--</option>
+                    </select>
+                </div>
+                <script src="~/Scripts/jquery-3.6.0.min.js"></script>
+                <script>
+                    $(document).ready(function () {
+                        $("#cid").change(function () {
+                            var countryId = $(this).val();
+                            debugger
+                            $.ajax({
+                                type: "post",
+                                url: "/User/GetStates?cid=" + countryId,
+                                contentType: "html",
+                                success: function (response) {
+                                    debugger
+                                    $("#sid").empty();
+                                    $("#cityid").empty();
+                                    $("#sid").append(response);
+                                }
+                            })
+                        })
+
+                        $("#sid").change(function () {
+                            var StateId = $(this).val();
+                            debugger
+                            $.ajax({
+                                type: "post",
+                                url: "/User/GetCities?sid=" + StateId,
+                                contentType: "html",
+                                success: function (response) {
+                                    debugger
+                                    $("#cityid").empty();
+                                    $("#cityid").append(response);
+                                }
+                            })
+                        })
+                    })
+
+                </script>
+            </div>
+            <br />
+
+            <label for="captcha" style="font-family:Times New Roman">Enter Captcha:</label>
+            <input type="text" id="captcha" name="captcha" class="form-control" style="font-family:Times New Roman" />
+            <br />
+            <img src="/User/Imageforcaptcha" id="Imageforcaptcha" />
+            <a href="#" id="refreshCaptcha">
+                <img src="~/Images/refreshCaptcha.jfif" height="30px" />
+            </a>
+            <div>
+                <input style="font-family:Times New Roman" type="submit" value="submit" id="submit" class="btn btn-primary" />
+            </div>
+        </div>
+        <br />
+        <button type="submit" class="btn btn-outline-info">SUBMIT</button>
+    </form>
+
+
+
+
+    <script src="//code.jquery.com/jquery-1.12.4.js"></script>
+    <script src="//code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+    <script src="~/Scripts/bootstrap.min.js"></script>
+    <script src="~/Scripts/jquery-3.6.0.min.js"></script>
+    <script>
+        $(function () {
+            $("#datepicker").datepicker();
+        });
+    </script>
+    <script type="text/javascript">
+
+        function divPopup() {
+            $('#myModal').modal('show');
+
+            $('#myModal').modal({
+                backdrop: true,
+                keyboard: true
+            })
+        }
+
+    </script>
+</body>
+</html>
